@@ -18,10 +18,14 @@ class User extends Model
         'role',
         'phone_number',
         'desa_id',
+        'province_id',
+        'regency_id',
+        'district_id',
+        'village_id',
         'status',
         'qr_code',
     ];
-
+    
     protected $hidden = [
         'password', 'remember_token',
     ];

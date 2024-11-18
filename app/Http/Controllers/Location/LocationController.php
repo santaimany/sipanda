@@ -1,67 +1,39 @@
 <?php
-
 namespace App\Http\Controllers\Location;
 
-use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Http;
 
 class LocationController extends Controller
 {
-    private $client;
-    private $apiKey;
+    private $baseUrl = 'https://emsifa.github.io/api-wilayah-indonesia/api/';
 
-    public function __construct()
-    {
-        $this->client = new Client();
-        $this->apiKey = '7bd395a20296186f823863c572df42f5'; // API Key Anda
-    }
-
+    // Ambil daftar provinsi
     public function getProvinces()
     {
-        $response = $this->client->get('https://api.rajaongkir.com/starter/province', [
-            'headers' => [
-                'key' => $this->apiKey,
-            ],
-        ]);
-
-        $data = json_decode($response->getBody(), true);
-        return response()->json($data['rajaongkir']['results']);
+        $response = Http::get($this->baseUrl . 'provinces.json');
+        return response()->json($response->json());
     }
 
+    // Ambil daftar kabupaten berdasarkan province_id
     public function getRegencies($province_id)
     {
-        $response = $this->client->get("https://api.rajaongkir.com/starter/city?province=$province_id", [
-            'headers' => [
-                'key' => $this->apiKey,
-            ],
-        ]);
-
-        $data = json_decode($response->getBody(), true);
-        return response()->json($data['rajaongkir']['results']);
+        $response = Http::get($this->baseUrl . "regencies/{$province_id}.json");
+        return response()->json($response->json());
     }
 
+    // Ambil daftar kecamatan berdasarkan regency_id
     public function getDistricts($regency_id)
     {
-        $response = $this->client->get("https://api.rajaongkir.com/starter/subdistrict?city=$regency_id", [
-            'headers' => [
-                'key' => $this->apiKey,
-            ],
-        ]);
-
-        $data = json_decode($response->getBody(), true);
-        return response()->json($data['rajaongkir']['results']);
+        $response = Http::get($this->baseUrl . "districts/{$regency_id}.json");
+        return response()->json($response->json());
     }
 
+    // Ambil daftar desa berdasarkan district_id
     public function getVillages($district_id)
     {
-        $response = $this->client->get("https://api.rajaongkir.com/starter/village?subdistrict=$district_id", [
-            'headers' => [
-                'key' => $this->apiKey,
-            ],
-        ]);
-
-        $data = json_decode($response->getBody(), true);
-        return response()->json($data['rajaongkir']['results']);
+        $response = Http::get($this->baseUrl . "villages/{$district_id}.json");
+        return response()->json($response->json());
     }
 }
