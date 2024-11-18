@@ -23,6 +23,7 @@ class CreateUsersTable extends Migration
             $table->enum('status', ['pending', 'verified', 'rejected'])->default('pending'); // Status
             $table->string('qr_code', 255)->nullable(); // QR Code
             $table->timestamps();
+            
 
             // Foreign Key
             $table->foreign('desa_id')->references('id')->on('desa')->onDelete('set null');

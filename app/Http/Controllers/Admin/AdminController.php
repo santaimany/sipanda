@@ -3,47 +3,56 @@
 namespace App\Http\Controllers\Admin;
 
 use Illuminate\Support\Str;
-use App\Http\Controllers\Controller;
 use App\Models\User;
 use Endroid\QrCode\Builder\Builder;
 use Endroid\QrCode\Writer\PngWriter;
+use App\Http\Controllers\Controller;
 
 class AdminController extends Controller
 {
-    public function verifyUser($userId)
+    public function verifyUser($id, $action)
     {
-        // Ambil data user berdasarkan ID
-        $user = User::findOrFail($userId);
+        $user = User::findOrFail($id);
 
-        // Cek jika user sudah di-verify
-        if ($user->status === 'verified') {
-            return response()->json(['message' => 'User already verified.'], 400);
+        // Cek apakah status sudah disetujui
+        if ($user->status === 'approved') {
+            return response()->json(['message' => 'User already approved.'], 400);
         }
 
-        // Generate License Key
-        $licenseKey = Str::uuid(); // Membuat unique license key
+        if ($action === 'approve') {
+            // Generate License Key
+            $licenseKey = Str::uuid();
 
-        // Path untuk menyimpan QR Code
-        $qrCodePath = "qrcodes/$licenseKey.png";
+            // Path untuk menyimpan QR Code
+            $qrCodePath = "qrcodes/$licenseKey.png";
 
-        // Generate QR Code menggunakan PHP QR Code
-        Builder::create()
-            ->writer(new PngWriter())
-            ->data($licenseKey)
-            ->size(300)
-            ->margin(10)
-            ->build()
-            ->saveToFile(public_path($qrCodePath));
+            // Generate QR Code
+            Builder::create()
+                ->writer(new PngWriter())
+                ->data($licenseKey)
+                ->size(300)
+                ->margin(10)
+                ->build()
+                ->saveToFile(storage_path("app/$qrCodePath"));
 
-        // Update user status, simpan QR Code, dan ubah status menjadi verified
-        $user->update([
-            'status' => 'verified',
-            'qr_code' => $qrCodePath,
-        ]);
+            // Update status, QR Code, dan License Key
+            $user->update([
+                'status' => 'pending_qr',
+                'qr_code' => $qrCodePath,
+                'license_key' => $licenseKey,
+            ]);
 
-        return response()->json([
-            'message' => 'User verified and QR Code generated successfully.',
-            'qr_code_path' => asset($qrCodePath),
-        ]);
+            return response()->json([
+                'message' => 'User approved and QR Code generated.',
+                'qr_code_path' => asset("storage/$qrCodePath"),
+            ]);
+        }
+
+        if ($action === 'reject') {
+            $user->update(['status' => 'rejected']);
+            return response()->json(['message' => 'User rejected.']);
+        }
+
+        return response()->json(['message' => 'Invalid action.'], 400);
     }
 }
