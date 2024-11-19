@@ -16,6 +16,9 @@ Route::post('/logout', [LoginController::class, 'logout'])->middleware('auth:san
 
 // Rute yang dilindungi
 Route::middleware(['auth:sanctum'])->group(function () {
+    Route::post('/admin/verify-user/{id}/{action}', [AdminController::class, 'verifyUser']);
+    Route::post('/user/verify-qr-code', [UserController::class, 'verifyQrCode']);
+
     Route::get('/dashboard/kepala_desa', function () {
         return response()->json(['message' => 'Welcome to Kepala Desa Dashboard']);
     });
@@ -37,5 +40,4 @@ Route::get('/villages/{district_id}', [LocationController::class, 'getVillages']
 
  
 
-    Route::post('/admin/verify-user/{id}/{action}', [AdminController::class, 'verifyUser']);
-    Route::post('/user/verify-qr-code', [UserController::class, 'verifyQrCode']);
+    
