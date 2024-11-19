@@ -12,6 +12,7 @@ class AdminController extends Controller
 {
     public function verifyUser($id, $action)
     {
+        
         $user = User::findOrFail($id);
 
         // Cek apakah status sudah disetujui
