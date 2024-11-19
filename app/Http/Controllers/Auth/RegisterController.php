@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\Auth;
 
 use App\Models\Desa;
@@ -11,7 +10,10 @@ use Illuminate\Support\Facades\Http;
 
 class RegisterController extends Controller
 {
-    public function register(Request $request)
+    /**
+     * Step 1: Register User (General Information)
+     */
+    public function registerIdentity(Request $request)
     {
         // Validasi input
         $validated = $request->validate([
@@ -20,22 +22,41 @@ class RegisterController extends Controller
             'password' => 'required|confirmed',
             'role' => 'required|in:admin,kepala_desa,bapanas',
             'phone_number' => 'nullable|string|max:15',
+        ]);
+
+        // Hash password sebelum menyimpan
+        $validated['password'] = Hash::make($validated['password']);
+
+        // Simpan user ke database
+        $user = User::create($validated);
+
+        return response()->json([
+            'message' => 'Step 1 completed. User created successfully.',
+            'data' => $user,
+        ], 201);
+    }
+
+    /**
+     * Step 2: Assign Desa (Only for Kepala Desa)
+     */
+    public function registerKepalaDesa(Request $request, $userId)
+    {
+        // Validasi input
+        $validated = $request->validate([
             'province_id' => 'required|integer',
             'regency_id' => 'required|integer',
             'district_id' => 'required|integer',
             'village_id' => 'required|integer',
         ]);
 
-        // Fetch data from API
+        // Fetch data desa dari API Emsifa
         $provinceResponse = Http::get("https://emsifa.github.io/api-wilayah-indonesia/api/province/{$validated['province_id']}.json");
         $regencyResponse = Http::get("https://emsifa.github.io/api-wilayah-indonesia/api/regency/{$validated['regency_id']}.json");
         $districtResponse = Http::get("https://emsifa.github.io/api-wilayah-indonesia/api/district/{$validated['district_id']}.json");
         $villageResponse = Http::get("https://emsifa.github.io/api-wilayah-indonesia/api/village/{$validated['village_id']}.json");
 
         if ($provinceResponse->failed() || $regencyResponse->failed() || $districtResponse->failed() || $villageResponse->failed()) {
-            return response()->json([
-                'message' => 'Data lokasi tidak ditemukan di API.',
-            ], 404);
+            return response()->json(['message' => 'Data lokasi tidak ditemukan di API.'], 404);
         }
 
         $province = $provinceResponse->json();
@@ -43,51 +64,48 @@ class RegisterController extends Controller
         $district = $districtResponse->json();
         $village = $villageResponse->json();
 
-        // Periksa apakah sudah ada kepala desa untuk desa ini
-        if ($request->role === 'kepala_desa') {
-            $existingKepalaDesa = User::where('role', 'kepala_desa')
-                ->where('village_id', $validated['village_id'])
-                ->exists();
+        // Validasi apakah desa sudah memiliki kepala desa
+        $existingKepalaDesa = Desa::where('provinsi', $province['name'])
+            ->where('kabupaten', $regency['name'])
+            ->where('kecamatan', $district['name'])
+            ->where('kelurahan', $village['name'])
+            ->whereNotNull('kepala_desa_id')
+            ->exists();
 
-            if ($existingKepalaDesa) {
-                return response()->json([
-                    'message' => 'Kepala desa sudah terdaftar untuk desa ini.',
-                ], 400);
-            }
+        if ($existingKepalaDesa) {
+            return response()->json([
+                'message' => 'Desa ini sudah memiliki kepala desa.',
+            ], 400);
         }
 
-        // Hash password
-        $validated['password'] = Hash::make($validated['password']);
-
-        // Cari desa berdasarkan lokasi
-        $desa = Desa::where('provinsi', $province['name'])
-                    ->where('kabupaten', $regency['name'])
-                    ->where('kecamatan', $district['name'])
-                    ->where('kelurahan', $village['name'])
-                    ->first();
-
-        if (!$desa) {
-            // Jika desa belum ada, buat desa baru
-            $desa = Desa::create([
-                'nama' => $village['name'],
+        // Cari atau buat desa di database
+        $desa = Desa::firstOrCreate(
+            [
                 'provinsi' => $province['name'],
                 'kabupaten' => $regency['name'],
                 'kecamatan' => $district['name'],
                 'kelurahan' => $village['name'],
-            ]);
-        }
+            ],
+            [
+                'nama' => $village['name'],
+            ]
+        );
 
-        // Simpan user
-        $user = User::create(array_merge($validated, ['desa_id' => $desa->id]));
+        // Update user dengan desa_id
+        $user = User::findOrFail($userId);
+        $user->desa_id = $desa->id;
+        $user->save();
 
-        // Jika user adalah kepala desa, update desa dengan ID kepala desa
-        if ($user->role === 'kepala_desa') {
-            $desa->update(['kepala_desa_id' => $user->id]);
-        }
+        // Tandai desa ini sudah memiliki kepala desa
+        $desa->kepala_desa_id = $user->id;
+        $desa->save();
 
         return response()->json([
-            'message' => 'User registered successfully',
-            'data' => $user,
-        ], 201);
+            'message' => 'Step 2 completed. Desa assigned to user successfully.',
+            'data' => [
+                'user' => $user,
+                'desa' => $desa,
+            ],
+        ], 200);
     }
 }

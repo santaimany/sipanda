@@ -9,7 +9,9 @@ use App\Http\Controllers\Admin\ApprovalController;
 use App\Http\Controllers\Location\LocationController;
 
 // Public routes
-Route::post('/register', [RegisterController::class, 'register']);
+Route::post('/register/identity', [RegisterController::class, 'registerIdentity']);
+Route::post('/register/kepaladesa/{userId}', [RegisterController::class, 'registerKepalaDesa']);
+
 
 Route::post('/login', [LoginController::class, 'login']);
 Route::post('/logout', [LoginController::class, 'logout'])->middleware('auth:sanctum');
