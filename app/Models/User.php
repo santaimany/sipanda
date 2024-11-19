@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Foundation\Auth\User as Authenticatable; // Ganti ini
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Laravel\Sanctum\HasApiTokens;
 
-class User extends Model
+class User extends Authenticatable // Ganti dari Model ke Authenticatable
 {
-    use HasFactory, SoftDeletes;
+    use HasApiTokens, HasFactory, SoftDeletes;
 
     protected $fillable = [
         'name', 'email', 'password', 'role', 'phone_number', 'desa_id', 'province_id', 'regency_id', 'district_id', 'village_id', 'status', 'qr_code', 'license_key',
@@ -28,11 +29,11 @@ class User extends Model
         });
     }
 
-
     public function desa()
     {
         return $this->belongsTo(Desa::class);
     }
+
     protected $hidden = [
         'password', 'remember_token',
     ];
