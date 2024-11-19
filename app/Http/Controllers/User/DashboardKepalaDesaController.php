@@ -27,4 +27,28 @@ class DashboardKepalaDesaController extends Controller
             'data' => $data,
         ], 200);
     }
+
+    public function getGreetingKades()
+    {
+        $user = Auth::user();
+
+        if ($user && $user->desa) {
+            $desa = $user->desa;
+            return response()->json([
+                'greeting' => "Selamat datang, {$user->name}!",
+                'address' => [
+                    'provinsi' => $desa->provinsi,
+                    'kabupaten' => $desa->kabupaten,
+                    'kecamatan' => $desa->kecamatan,
+                    'kelurahan' => $desa->kelurahan,
+                    'desa' => $desa->nama,
+                ],
+            ]);
+        }
+
+        return response()->json([
+            'greeting' => "Selamat datang, {$user->name}!",
+            'address' => 'Alamat tidak tersedia.',
+        ]);
+    }
 }
