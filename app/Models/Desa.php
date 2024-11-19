@@ -21,4 +21,9 @@ class Desa extends Model
     {
         return $this->belongsTo(User::class, 'kepala_desa_id');
     }
+
+    public function pangan()
+    {
+        return $this->hasMany(Pangan::class, 'desa_id');
+    }
 }
