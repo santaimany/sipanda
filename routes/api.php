@@ -32,6 +32,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // Dashboard routes
     Route::get('/dashboard/kepala_desa/user', [DashboardKepalaDesaController::class, 'getUserKades']); // Data user dan desa untuk kepala desa
+    Route::get('/dashboard/kepala_desa', [DashboardKepalaDesaController::class, 'getGreetingKades']); // Greeting untuk kepala desa
     Route::get('/dashboard/kepala_desa', function () {
         return response()->json(['message' => 'Welcome to Kepala Desa Dashboard']);
     });
