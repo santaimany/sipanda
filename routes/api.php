@@ -18,6 +18,8 @@ Route::post('/login', [LoginController::class, 'login']);
 // Protected routes (hanya bisa diakses dengan token)
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/pangan', [PanganController::class, 'getPanganByUserDesa']);
+    Route::get('/pangan/persentase', [PanganController::class, 'getPersentaseBeratByDesa']);
+
     // Logout
     Route::post('/logout', [LoginController::class, 'logout']);
 
