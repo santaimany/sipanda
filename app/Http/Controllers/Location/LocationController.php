@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Http;
 
 class LocationController extends Controller
 {
-    private $baseUrl = 'https://emsifa.github.io/api-wilayah-indonesia/api/';
+    private $baseUrl = 'https://santaimany.github.io/api-wilayah-indonesia/api/';
 
     // Ambil daftar provinsi
     public function getProvinces()

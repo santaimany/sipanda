@@ -24,7 +24,7 @@ class UserController extends Controller
         }
 
         // Update status menjadi approved
-        $user->update(['status' => 'approved']);
+        $user->update(['status' => 'verified']);
 
         return response()->json(['message' => 'User verified successfully.']);
     }

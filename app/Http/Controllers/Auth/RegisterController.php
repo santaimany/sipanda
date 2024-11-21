@@ -50,19 +50,26 @@ class RegisterController extends Controller
         ]);
 
         // Fetch data desa dari API Emsifa
-        $provinceResponse = Http::get("https://emsifa.github.io/api-wilayah-indonesia/api/province/{$validated['province_id']}.json");
-        $regencyResponse = Http::get("https://emsifa.github.io/api-wilayah-indonesia/api/regency/{$validated['regency_id']}.json");
-        $districtResponse = Http::get("https://emsifa.github.io/api-wilayah-indonesia/api/district/{$validated['district_id']}.json");
-        $villageResponse = Http::get("https://emsifa.github.io/api-wilayah-indonesia/api/village/{$validated['village_id']}.json");
+      
+        try {
+            // Fetch data desa dari API Emsifa
+            $provinceResponse = Http::get("https://santaimany.github.io/api-wilayah-indonesia/api/province/{$validated['province_id']}.json");
+            $regencyResponse = Http::get("https://santaimany.github.io/api-wilayah-indonesia/api/regency/{$validated['regency_id']}.json");
+            $districtResponse = Http::get("https://santaimany.github.io/api-wilayah-indonesia/api/district/{$validated['district_id']}.json");
+            $villageResponse = Http::get("https://santaimany.github.io/api-wilayah-indonesia/api/village/{$validated['village_id']}.json");
 
-        if ($provinceResponse->failed() || $regencyResponse->failed() || $districtResponse->failed() || $villageResponse->failed()) {
-            return response()->json(['message' => 'Data lokasi tidak ditemukan di API.'], 404);
+            if ($provinceResponse->failed() || $regencyResponse->failed() || $districtResponse->failed() || $villageResponse->failed()) {
+                return response()->json(['message' => 'Data lokasi tidak ditemukan di API.'], 404);
+            }
+
+            $province = $provinceResponse->json();
+            $regency = $regencyResponse->json();
+            $district = $districtResponse->json();
+            $village = $villageResponse->json();
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Terjadi kesalahan saat mengambil data lokasi dari API.'], 500);
         }
 
-        $province = $provinceResponse->json();
-        $regency = $regencyResponse->json();
-        $district = $districtResponse->json();
-        $village = $villageResponse->json();
 
         // Validasi apakah desa sudah memiliki kepala desa
         $existingKepalaDesa = Desa::where('provinsi', $province['name'])

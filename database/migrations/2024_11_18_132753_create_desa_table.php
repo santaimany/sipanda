@@ -11,18 +11,24 @@ class CreateDesaTable extends Migration
         Schema::disableForeignKeyConstraints();
 
         Schema::create('desa', function (Blueprint $table) {
-            $table->id(); // Primary Key
-            $table->string('nama', 100); // Nama desa
-            $table->string('provinsi', 100); // Nama provinsi
-            $table->string('kabupaten', 100); // Nama kabupaten
-            $table->string('kecamatan', 100); // Nama kecamatan
-            $table->string('kelurahan', 100)->nullable(); // Nama kelurahan
-            $table->timestamps(); // created_at dan updated_at
+            $table->id();
+            $table->string('nama', 100);
+            $table->string('provinsi', 100);
+            $table->string('kabupaten', 100);
+            $table->string('kecamatan', 100);
+            $table->string('kelurahan', 100);
+            $table->unsignedBigInteger('kepala_desa_id')->nullable();
+            $table->timestamps();
+    
+            // Foreign key constraint
+            $table->foreign('kepala_desa_id')->references('id')->on('users')->onDelete('cascade');
+    
         });
     }
 
     public function down()
     {
         Schema::dropIfExists('desa');
+        Schema::disableForeignKeyConstraints();
     }
 }

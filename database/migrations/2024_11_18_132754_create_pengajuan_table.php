@@ -7,8 +7,6 @@ class CreatePengajuanTable extends Migration
 {
     public function up()
     {
-        
-
         Schema::create('pengajuan', function (Blueprint $table) {
             $table->id(); // Primary Key
             $table->unsignedBigInteger('desa_asal_id'); // Desa asal
