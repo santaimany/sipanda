@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Admin\ApprovalController;
 use App\Http\Controllers\Location\LocationController;
+use App\Http\Controllers\UserBapanas\PendataanController;
 
 // Public routes
 Route::post('/register/identity', [RegisterController::class, 'registerIdentity']);
@@ -21,15 +22,19 @@ Route::post('/user/verify-qr-code', [UserController::class, 'verifyQrCode']);
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/admin/verify-user/{id}/{action}', [AdminController::class, 'verifyUser']);
  
-
+    //punya kepala desa
     Route::get('/dashboard/kepala_desa', function () {
         return response()->json(['message' => 'Welcome to Kepala Desa Dashboard']);
     });
 
+    //punya bapanas
     Route::get('/dashboard/bapanas', function () {
         return response()->json(['message' => 'Welcome to Bapanas Dashboard']);
     });
+    Route::get('/pendataan', [PendataanController::class, 'showDesaData']);
+    Route::post('/pendataan/form', [PendataanController::class, 'formPanganData']);
 
+    //punya admin
     Route::get('/dashboard/admin', function () {
         return response()->json(['message' => 'Welcome to Admin Dashboard']);
     });
