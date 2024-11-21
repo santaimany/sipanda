@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\User\UserController;
 use App\Http\Controllers\auth\LoginController;
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\User\PanganController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Admin\ApprovalController;
 use App\Http\Controllers\Location\LocationController;
@@ -23,7 +24,7 @@ Route::post('/login', [LoginController::class, 'login']);
 
 // Protected routes (hanya bisa diakses dengan token)
 Route::middleware(['auth:sanctum'])->group(function () {
-
+    Route::get('/pangan', [PanganController::class, 'getPanganByUserDesa']);
     // Logout
     Route::post('/logout', [LoginController::class, 'logout']);
 
