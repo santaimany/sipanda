@@ -1,9 +1,11 @@
 <?php
 namespace App\Http\Controllers\User;
 
+use App\Models\Desa;
 use App\Models\Pangan;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Http;
 
 class PanganController extends Controller
 {
@@ -52,5 +54,72 @@ class PanganController extends Controller
             'message' => 'Persentase berat berdasarkan jenis pangan',
             'data' => $persentaseBerat,
         ]);
+    }
+
+    public function getPanganDesaLain(Request $request)
+    {
+        // Fungsi yang Anda buat sebelumnya
+        $user = $request->user();
+
+        // Validasi apakah user memiliki desa yang terkait
+        if (!$user->desa_id) {
+            return response()->json(['message' => 'User tidak memiliki desa yang terkait.'], 400);
+        }
+
+        // Ambil desa user
+        $desaUser = Desa::find($user->desa_id);
+
+        if (!$desaUser || !$desaUser->latitude || !$desaUser->longitude) {
+            return response()->json(['message' => 'Koordinat desa user tidak ditemukan.'], 400);
+        }
+
+        // Ambil data pangan dari desa lain
+        $panganDesaLain = Pangan::where('desa_id', '!=', $desaUser->id)
+            ->with('desa') // Untuk mendapatkan informasi desa terkait
+            ->orderBy('jenis_pangan', 'asc')
+            ->get();
+
+        // Tambahkan perhitungan jarak untuk setiap desa
+        $panganDesaLain = $panganDesaLain->map(function ($item) use ($desaUser) {
+            $item->jarak = $this->calculateDistance(
+                $desaUser->latitude,
+                $desaUser->longitude,
+                $item->desa->latitude,
+                $item->desa->longitude
+            );
+
+            return $item;
+        });
+
+        return response()->json(['data' => $panganDesaLain], 200);
+    }
+
+    private function calculateDistance($latitudeAsal, $longitudeAsal, $latitudeTujuan, $longitudeTujuan)
+    {
+        $apiKey = env('HERE_API_KEY');
+
+        if (!$apiKey) {
+            return null;
+        }
+
+        $url = "https://router.hereapi.com/v8/routes";
+
+        $params = [
+            'transportMode' => 'car',
+            'origin' => "{$latitudeAsal},{$longitudeAsal}",
+            'destination' => "{$latitudeTujuan},{$longitudeTujuan}",
+            'return' => 'summary',
+            'apiKey' => $apiKey,
+        ];
+
+        $response = Http::get($url, $params);
+
+        if ($response->failed() || empty($response->json()['routes'])) {
+            return null;
+        }
+
+        $distanceMeters = $response->json()['routes'][0]['sections'][0]['summary']['length'] ?? 0;
+
+        return $distanceMeters / 1000; // Konversi ke kilometer
     }
 }
