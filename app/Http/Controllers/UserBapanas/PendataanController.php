@@ -6,6 +6,7 @@ use App\Models\Desa;
 use App\Models\Pangan;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\JenisPangan;
 use GuzzleHttp\Psr7\Message;
 
 class PendataanController extends Controller
@@ -31,35 +32,49 @@ class PendataanController extends Controller
 
     }
 
+    public function getDataPangan()
+{
+    $dataPangan = JenisPangan::all(['id', 'nama_pangan', 'harga']);
+    return response()->json($dataPangan);
+}
+
     /**
      * Tambahkan data pangan berdasarkan input dari form.
      */
     public function insertPanganData(Request $request, $desa_id)
-    {
-        // Validasi bahwa desa_id valid dan desa tersebut memiliki kepala desa
-        $desa = Desa::where('id', $desa_id)->whereNotNull('kepala_desa_id')->first();
-        if (!$desa) {
-            return response()->json(['error' => 'Desa tidak valid atau tidak memiliki kepala desa.'], 404);
-        }
-
-        // Validasi input dari form
-        $validated = $request->validate([
-            'jenis_pangan' => 'required|string|max:100',
-            'berat' => 'required|numeric|min:0',
-            'harga' => 'required|numeric|min:0',
-        ]);
-
-        // Simpan data pangan ke desa yang dipilih
-        Pangan::create([
-            'desa_id' => $desa->id, // Gunakan desa_id yang telah divalidasi
-            'jenis_pangan' => $validated['jenis_pangan'],
-            'berat' => $validated['berat'],
-            'harga' => $validated['harga'],
-            'tanggal' => now(),
-        ]);
-
-        return response()->json(['message' => 'Berhasil Memasukkan Data']);
+{
+    // Validasi bahwa desa_id valid dan desa tersebut memiliki kepala desa
+    $desa = Desa::where('id', $desa_id)->whereNotNull('kepala_desa_id')->first();
+    if (!$desa) {
+        return response()->json(['error' => 'Desa tidak valid atau tidak memiliki kepala desa.'], 404);
     }
+
+    // Ambil semua data dari tabel jenis_pangan
+    $jenisPangan = JenisPangan::pluck('id')->toArray(); // Mengambil ID jenis_pangan untuk validasi
+
+    // Validasi input dari form
+    $validated = $request->validate([
+        'jenis_pangan_id' => 'required|integer|in:' . implode(',', $jenisPangan), // Validasi ID jenis_pangan
+        'berat' => 'required|numeric|min:0',
+    ]);
+
+    // Cari data jenis pangan berdasarkan ID untuk mendapatkan nama dan harga
+    $selectedJenisPangan = JenisPangan::find($validated['jenis_pangan_id']);
+    if (!$selectedJenisPangan) {
+        return response()->json(['error' => 'Jenis pangan yang dipilih tidak valid.'], 400);
+    }
+
+    // Simpan data pangan ke desa yang dipilih
+    Pangan::create([
+        'desa_id' => $desa->id, // Gunakan desa_id yang telah divalidasi
+        'jenis_pangan' => $selectedJenisPangan->nama_pangan, // Ambil nama dari jenis_pangan
+        'berat' => $validated['berat'],
+        'harga' => $selectedJenisPangan->harga, // Ambil harga dari jenis_pangan
+        'tanggal' => now(),
+    ]);
+
+    return response()->json(['message' => 'Berhasil Memasukkan Data']);
+}
 
     public function updatePanganData(Request $request, $pangan_id)
 {
@@ -73,22 +88,12 @@ class PendataanController extends Controller
 
     // Validasi input dari form, hanya validasi untuk yang dikirim
     $validated = $request->validate([
-        'jenis_pangan' => 'nullable|string|max:100',  // nullable berarti tidak wajib
         'berat' => 'nullable|numeric|min:0',          // nullable berarti tidak wajib
-        'harga' => 'nullable|numeric|min:0',          // nullable berarti tidak wajib
     ]);
 
     // Update hanya kolom yang ada di input, jika input tidak ada maka biarkan kolom tetap
-    if ($request->has('jenis_pangan')) {
-        $pangan->jenis_pangan = $validated['jenis_pangan'];
-    }
-
-    if ($request->has('berat')) {
+    if ($request->filled('berat')) {
         $pangan->berat = $validated['berat'];
-    }
-
-    if ($request->has('harga')) {
-        $pangan->harga = $validated['harga'];
     }
 
     // Simpan data yang telah diperbarui
