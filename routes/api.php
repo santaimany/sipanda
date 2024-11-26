@@ -11,10 +11,12 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\User\PengajuanController;
 use App\Http\Controllers\Bapanas\ApprovalController;
 use App\Http\Controllers\Location\LocationController;
+use App\Http\Controllers\UserBapanas\PendataanController;
 use App\Http\Controllers\User\DashboardKepalaDesaController; // Import untuk dashboard kepala desa
 
 // Public routes
-Route::post('/register', [RegisterController::class, 'register']);
+Route::post('/register/identity', [RegisterController::class, 'registerIdentity']);
+Route::post('/register/kepaladesa/{userId}', [RegisterController::class , 'registerKepalaDesa'] );
 Route::post('/login', [LoginController::class, 'login']);
 
 Route::post('/calculate-distance', [JarakController::class, 'calculateDistance']);
@@ -57,18 +59,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/dashboard/bapanas', function () {
         return response()->json(['message' => 'Welcome to Bapanas Dashboard']);
     });
-<<<<<<< HEAD
     Route::get('/pendataan', [PendataanController::class, 'showDesaData']);
     Route::get('/pendataan/datapangan', [PendataanController::class, 'getDataPangan']);
     Route::post('/pendataan/insert/{desa_id}', [PendataanController::class, 'insertPanganData']);
     Route::put('/pendataan/update/{pangan_id}', [PendataanController::class, 'updatePanganData']); // Update data
     Route::delete('/pendataan/delete/{pangan_id}', [PendataanController::class, 'deletePanganData']); // Delete data
-=======
-    
-
-
-
->>>>>>> pengajuan-kepaladesa
 
     Route::get('/dashboard/admin', function () {
         return response()->json(['message' => 'Welcome to Admin Dashboard']);
