@@ -14,14 +14,7 @@ use App\Http\Controllers\Location\LocationController;
 use App\Http\Controllers\User\DashboardKepalaDesaController; // Import untuk dashboard kepala desa
 
 // Public routes
-<<<<<<< HEAD
-Route::post('/register/identity', [RegisterController::class, 'registerIdentity']);
-Route::post('/register/kepaladesa/{userId}', [RegisterController::class, 'registerKepalaDesa']);
-
-
-=======
 Route::post('/register', [RegisterController::class, 'register']);
->>>>>>> ee61a7a (get user kepala desa -> done)
 Route::post('/login', [LoginController::class, 'login']);
 
 Route::post('/calculate-distance', [JarakController::class, 'calculateDistance']);
