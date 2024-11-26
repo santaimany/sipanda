@@ -95,8 +95,11 @@ class RegisterController extends Controller
             ],
             [
                 'nama' => $village['name'],
+                'latitude' => null, // Latitude akan diisi oleh model
+                'longitude' => null, // Longitude akan diisi oleh model
             ]
         );
+        
 
         // Update user dengan desa_id
         $user = User::findOrFail($userId);
@@ -105,7 +108,9 @@ class RegisterController extends Controller
 
         // Tandai desa ini sudah memiliki kepala desa
         $desa->kepala_desa_id = $user->id;
+
         $desa->save();
+        
 
         return response()->json([
             'message' => 'Step 2 completed. Desa assigned to user successfully.',

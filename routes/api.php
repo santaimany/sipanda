@@ -9,7 +9,7 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\User\PanganController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\User\PengajuanController;
-use App\Http\Controllers\Bapanas\ApprovalController;
+use App\Http\Controllers\UserBapanas\ApprovalController;
 use App\Http\Controllers\Location\LocationController;
 use App\Http\Controllers\UserBapanas\PendataanController;
 use App\Http\Controllers\User\DashboardKepalaDesaController; // Import untuk dashboard kepala desa
