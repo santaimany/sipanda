@@ -11,7 +11,7 @@ class Pangan extends Model
 
     protected $table = 'pangan';
     protected $fillable = [
-        'desa_id', 'jenis_pangan', 'berat', 'tanggal'
+        'desa_id', 'jenis_pangan', 'berat', 'tanggal', 'harga'
     ];
 
     public function desa()

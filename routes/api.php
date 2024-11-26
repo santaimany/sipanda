@@ -42,8 +42,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/pengajuan/history', [PengajuanController::class, 'getUserHistory']);
     Route::get('/pengajuan/riwayat/{desaId}', [PengajuanController::class, 'getRiwayatPengajuan']);
     Route::get('/bapanas/pengajuan/pending', [ApprovalController::class, 'getPendingPengajuan']);
-    Route::post('/bapanas/pengajuan/{id}/approve', [ApprovalController::class, 'approve']);
-    Route::post('/bapanas/pengajuan/{id}/reject', [ApprovalController::class, 'reject']);
+    Route::put('/bapanas/pengajuan/{id}/approve', [ApprovalController::class, 'approve']);
+    Route::put('/bapanas/pengajuan/{id}/reject', [ApprovalController::class, 'reject']);
     Route::get('/bapanas/pengajuan/approved', [ApprovalController::class, 'getApprovedPengajuan']);
     Route::get('/bapanas/pengajuan/rejected', [ApprovalController::class, 'getRejectedPengajuan']);
 
