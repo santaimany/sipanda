@@ -9,18 +9,18 @@ class Pengajuan extends Model
     use HasFactory;
 
     protected $table = 'pengajuan';
-
     protected $fillable = [
         'desa_asal_id',
         'desa_tujuan_id',
         'jenis_pangan',
         'berat',
         'jarak',
-        'status',
-        'bapanas_id',
         'total_harga',
         'ongkir',
-        'alasan',
+        'pajak', // Tambahkan pajak
+        'jasa_pengiriman',
+        'status',
+        'invoice_number',
     ];
 
     public function desaAsal()

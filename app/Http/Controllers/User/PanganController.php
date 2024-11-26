@@ -96,30 +96,24 @@ class PanganController extends Controller
 
     private function calculateDistance($latitudeAsal, $longitudeAsal, $latitudeTujuan, $longitudeTujuan)
     {
-        $apiKey = env('HERE_API_KEY');
+        $earthRadius = 6371; // Radius bumi dalam kilometer
 
-        if (!$apiKey) {
-            return null;
-        }
-
-        $url = "https://router.hereapi.com/v8/routes";
-
-        $params = [
-            'transportMode' => 'car',
-            'origin' => "{$latitudeAsal},{$longitudeAsal}",
-            'destination' => "{$latitudeTujuan},{$longitudeTujuan}",
-            'return' => 'summary',
-            'apiKey' => $apiKey,
-        ];
-
-        $response = Http::get($url, $params);
-
-        if ($response->failed() || empty($response->json()['routes'])) {
-            return null;
-        }
-
-        $distanceMeters = $response->json()['routes'][0]['sections'][0]['summary']['length'] ?? 0;
-
-        return $distanceMeters / 1000; // Konversi ke kilometer
+        // Konversi derajat ke radian
+        $latFrom = deg2rad($latitudeAsal);
+        $lonFrom = deg2rad($longitudeAsal);
+        $latTo = deg2rad($latitudeTujuan);
+        $lonTo = deg2rad($longitudeTujuan);
+    
+        // Haversine formula
+        $latDelta = $latTo - $latFrom;
+        $lonDelta = $lonTo - $lonFrom;
+    
+        $a = sin($latDelta / 2) * sin($latDelta / 2) +
+             cos($latFrom) * cos($latTo) *
+             sin($lonDelta / 2) * sin($lonDelta / 2);
+    
+        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+    
+        return $earthRadius * $c; // Jarak dalam kilometer
     }
 }

@@ -34,8 +34,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/pengajuan/{id}/invoice', [PengajuanController::class, 'getInvoice']);
 
   
-    Route::get('/pengajuan/history', [PengajuanController::class, 'getUserHistory']);
-    Route::get('/pengajuan/riwayat/{desaId}', [PengajuanController::class, 'getRiwayatPengajuan']);
+    
+    Route::get('/pengajuan/riwayat', [PengajuanController::class, 'getRiwayatPengajuan']);
+    Route::get('/pengajuan/detail/{id}', [PengajuanController::class, 'getPengajuanDetail']);
+
     Route::get('/bapanas/pengajuan/pending', [ApprovalController::class, 'getPendingPengajuan']);
     Route::put('/bapanas/pengajuan/{id}/approve', [ApprovalController::class, 'approve']);
     Route::put('/bapanas/pengajuan/{id}/reject', [ApprovalController::class, 'reject']);
@@ -69,10 +71,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
         return response()->json(['message' => 'Welcome to Admin Dashboard']);
     });
 
-    // QR Code Verification
-    Route::post('/user/verify-qr-code', [UserController::class, 'verifyQrCode']);
 });
 
+// QR Code Verification
+Route::post('/user/verify-qr-code', [UserController::class, 'verifyQrCode']);
 // Location routes (API Emsifa Integration)
 Route::get('/provinces', [LocationController::class, 'getProvinces']);
 Route::get('/regencies/{province_id}', [LocationController::class, 'getRegencies']);
