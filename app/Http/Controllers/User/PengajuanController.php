@@ -71,7 +71,7 @@ class PengajuanController extends Controller
         }
 
         // Cek stok pangan di desa asal
-        $pangan = Pangan::where('desa_id', $desaAsal->id)
+        $pangan = Pangan::where('desa_id', $desaTujuan->id)
             ->where('jenis_pangan', $validated['jenis_pangan'])
             ->first();
 
