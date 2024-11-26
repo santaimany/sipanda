@@ -57,18 +57,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/dashboard/bapanas', function () {
         return response()->json(['message' => 'Welcome to Bapanas Dashboard']);
     });
-<<<<<<< HEAD
-    
-
-
-
-=======
     Route::get('/pendataan', [PendataanController::class, 'showDesaData']);
     Route::get('/pendataan/datapangan', [PendataanController::class, 'getDataPangan']);
     Route::post('/pendataan/insert/{desa_id}', [PendataanController::class, 'insertPanganData']);
     Route::put('/pendataan/update/{pangan_id}', [PendataanController::class, 'updatePanganData']); // Update data
     Route::delete('/pendataan/delete/{pangan_id}', [PendataanController::class, 'deletePanganData']); // Delete data
->>>>>>> 190bc93 (insert pangan pakai enum ambil di data pangan pada tabel jenis_pangan)
 
     Route::get('/dashboard/admin', function () {
         return response()->json(['message' => 'Welcome to Admin Dashboard']);
