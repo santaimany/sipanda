@@ -16,19 +16,38 @@ class PendataanController extends Controller
      */
     public function showDesaData()
     {
-        $dataDesa = Desa::select('id', 'nama', 'provinsi', 'kabupaten', 'kecamatan', 'kelurahan')->get();
+        $dataDesa = Desa::with(['pangan' => function($query) {
+            $query->orderBy('updated_at', 'desc'); // Urutkan pangan berdasarkan waktu update terakhir
+        }])
+        ->select('id', 'provinsi', 'kabupaten', 'kecamatan', 'kelurahan')
+        ->get();
 
-    // Tambahkan nama lengkap di sisi PHP
-    $dataDesa = $dataDesa->map(function ($desa) {
-        $desa->nama_lengkap = "{$desa->nama}, {$desa->kelurahan}, {$desa->kecamatan}, {$desa->kabupaten}, {$desa->provinsi}";
+        // Modifikasi data desa untuk menambahkan nama lengkap dan informasi pangan serta last update
+        $dataDesa = $dataDesa->map(function ($desa) {
+        $desa->nama_lengkap = "{$desa->kelurahan}, {$desa->kecamatan}, {$desa->kabupaten}, {$desa->provinsi}";
+        $desa->jumlah_pangan = $desa->pangan->count(); // Hitung jumlah pangan yang dimiliki desa
+        
+        // Last update untuk data pangan (ambil yang paling terbaru)
+        $desa->last_update = $desa->pangan->isNotEmpty()
+        ? $desa->pangan->first()['updated_at']->format('d-m-Y H:i:s')
+        : 'Belum Diperbarui';
+
+        // Gabungkan data pangan dan tanggal terakhir update untuk setiap pangan
+        $desa->pangan = $desa->pangan->map(function ($pangan) {
+            return [
+                'nama_pangan' => $pangan->nama_pangan,
+                'last_update' => $pangan->updated_at->format('d-m-Y H:i:s')  // Format tanggal update pangan
+            ];
+        });
+
         return $desa;
-    });
+        });
 
-    // Kembalikan data desa dengan nama lengkap sebagai JSON
-    return response()->json([
+        // Kembalikan data desa beserta pangan dan last update dalam format JSON
+        return response()->json([
         'success' => true,
         'data' => $dataDesa,
-    ]);
+        ]);
 
     }
 

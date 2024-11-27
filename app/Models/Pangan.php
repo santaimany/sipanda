@@ -18,4 +18,6 @@ class Pangan extends Model
     {
         return $this->belongsTo(Desa::class, 'desa_id');
     }
+
+    protected $dates = ['updated_at'];
 }

@@ -13,4 +13,10 @@ class JenisPangan extends Model
     protected $table = 'jenis_pangan';
 
     protected $fillable = ['nama_pangan', 'harga'];
+
+    // Relasi ke histori harga
+    public function hargaHistori()
+    {
+        return $this->hasMany(HargaHistori::class, 'jenis_pangan_id');
+    }
 }
