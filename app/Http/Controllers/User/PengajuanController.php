@@ -18,59 +18,15 @@ class PengajuanController extends Controller
 }
 
     // Membuat pengajuan baru
-    public function create(Request $request)
+    public function cekKetersediaan(Request $request)
     {
         $validated = $request->validate([
             'desa_tujuan_id' => 'required|exists:desa,id',
             'jenis_pangan' => 'required|string',
             'berat' => 'required|numeric|min:1',
-            'jasa_pengiriman' => 'required|string|in:JNE,SICEPAT,JNT', // Validasi jasa pengiriman
         ]);
     
-        $user = $request->user();
-    
-        if (!$user->desa_id) {
-            return response()->json(['message' => 'User tidak memiliki desa yang terkait.'], 400);
-        }
-    
-        $desaAsal = Desa::find($user->desa_id);
-    
-        if ($desaAsal->id == $validated['desa_tujuan_id']) {
-            return response()->json(['message' => 'Pengajuan tidak dapat dibuat ke desa sendiri.'], 400);
-        }
-    
-        $desaTujuan = Desa::findOrFail($validated['desa_tujuan_id']);
-    
-        if (!$desaAsal->latitude || !$desaAsal->longitude || !$desaTujuan->latitude || !$desaTujuan->longitude) {
-            return response()->json(['message' => 'Koordinat desa asal atau tujuan tidak ditemukan.'], 400);
-        }
-    
-        $existingPengajuan = Pengajuan::where('desa_asal_id', $desaAsal->id)
-            ->where('desa_tujuan_id', $validated['desa_tujuan_id'])
-            ->where('status', 'pending')
-            ->first();
-    
-        if ($existingPengajuan) {
-            return response()->json(['message' => 'Pengajuan sudah ada dan masih pending. Tunggu hingga pengajuan diproses sebelum membuat pengajuan baru.'], 400);
-        }
-    
-        $jenisPangan = JenisPangan::where('nama_pangan', $validated['jenis_pangan'])->first();
-        if (!$jenisPangan) {
-            return response()->json(['message' => 'Jenis pangan tidak valid.'], 400);
-        }
-    
-        $jarak = $this->calculateDistance(
-            $desaAsal->latitude,
-            $desaAsal->longitude,
-            $desaTujuan->latitude,
-            $desaTujuan->longitude
-        );
-    
-        if (is_null($jarak)) {
-            return response()->json(['message' => 'Gagal menghitung jarak menggunakan Haversine formula.'], 500);
-        }
-    
-        $pangan = Pangan::where('desa_id', $desaTujuan->id)
+        $pangan = Pangan::where('desa_id', $validated['desa_tujuan_id'])
             ->where('jenis_pangan', $validated['jenis_pangan'])
             ->first();
     
@@ -78,54 +34,148 @@ class PengajuanController extends Controller
             return response()->json(['message' => 'Stok pangan tidak mencukupi.'], 400);
         }
     
-        // Perhitungan ongkir berdasarkan jasa pengiriman
-        $tarifPerKgPerKm = 0;
-        switch ($validated['jasa_pengiriman']) {
-            case 'JNE':
-                $tarifPerKgPerKm = 6; // Tarif JNE: Rp6 per kg per km
-                break;
-            case 'SICEPAT':
-                $tarifPerKgPerKm = 5; // Tarif SICEPAT: Rp5 per kg per km
-                break;
-            case 'JNT':
-                $tarifPerKgPerKm = 4; // Tarif JNT: Rp4 per kg per km
-                break;
-            default:
-                return response()->json(['message' => 'Jasa pengiriman tidak valid.'], 400);
-        }
-    
-        $totalHarga = $validated['berat'] * $jenisPangan->harga;
-        $ongkir = $jarak * $validated['berat'] * $tarifPerKgPerKm;
-        $pajak = $totalHarga * 0.01;
-    
-        $invoiceNumber = 'INV-' . strtoupper(uniqid());
-    
-        $pengajuan = Pengajuan::create([
-            'desa_asal_id' => $desaAsal->id,
-            'desa_tujuan_id' => $validated['desa_tujuan_id'],
-            'jenis_pangan' => $validated['jenis_pangan'],
-            'berat' => $validated['berat'],
-            'jarak' => $jarak,
-            'total_harga' => $totalHarga,
-            'ongkir' => $ongkir,
-            'pajak' => $pajak,
-            'jasa_pengiriman' => $validated['jasa_pengiriman'], // Simpan jasa pengiriman
-            'status' => 'pending',
-            'invoice_number' => $invoiceNumber,
-        ]);
-    
-        return response()->json([
-            'message' => 'Pengajuan berhasil dibuat.',
-            'data' => [
-                'invoice_number' => $pengajuan->invoice_number,
-                'jasa_pengiriman' => $validated['jasa_pengiriman'],
-                'total_harga' => $this->formatRupiah($totalHarga),
-                'ongkir' => $this->formatRupiah($ongkir),
-                'pajak' => $this->formatRupiah($pajak),
-                'total' => $this->formatRupiah($totalHarga + $ongkir + $pajak),
-            ],
-        ], 201);
+        return response()->json(['message' => 'Stok pangan tersedia.'], 200);
     }
+    // Simulasi perhitungan invoice tanpa menyimpan ke database
+public function simulateInvoice(Request $request)
+{
+    $validated = $request->validate([
+        'desa_tujuan_id' => 'required|exists:desa,id',
+        'jenis_pangan' => 'required|string',
+        'berat' => 'required|numeric|min:1',
+        'jasa_pengiriman' => 'required|string|in:JNE,SICEPAT,JNT',
+    ]);
+
+    $user = $request->user();
+
+    if (!$user->desa_id) {
+        return response()->json(['message' => 'User tidak memiliki desa yang terkait.'], 400);
+    }
+
+    $desaAsal = Desa::find($user->desa_id);
+    $desaTujuan = Desa::findOrFail($validated['desa_tujuan_id']);
+
+    if ($desaAsal->id == $desaTujuan->id) {
+        return response()->json(['message' => 'Tidak dapat mengajukan ke desa sendiri.'], 400);
+    }
+
+    $jarak = $this->calculateDistance(
+        $desaAsal->latitude,
+        $desaAsal->longitude,
+        $desaTujuan->latitude,
+        $desaTujuan->longitude
+    );
+
+    if (is_null($jarak)) {
+        return response()->json(['message' => 'Gagal menghitung jarak.'], 500);
+    }
+
+    $jenisPangan = JenisPangan::where('nama_pangan', $validated['jenis_pangan'])->first();
+    if (!$jenisPangan) {
+        return response()->json(['message' => 'Jenis pangan tidak valid.'], 400);
+    }
+
+    // Hitung ongkir berdasarkan jasa pengiriman
+    $tarifPerKgPerKm = match ($validated['jasa_pengiriman']) {
+        'JNE' => 6,
+        'SICEPAT' => 5,
+        'JNT' => 4,
+        default => 0,
+    };
+
+    $totalHarga = $validated['berat'] * $jenisPangan->harga;
+    $ongkir = $jarak * $validated['berat'] * $tarifPerKgPerKm;
+    $pajak = $totalHarga * 0.01;
+    $total = $totalHarga + $ongkir + $pajak;
+
+    return response()->json([
+        'desa_penerima' => $desaTujuan->nama,
+        'desa_pengirim' => $desaAsal->nama,
+        'jarak' => round($jarak, 2) . ' KM',
+        'jenis_pangan' => $jenisPangan->nama_pangan,
+        'berat_diajukan' => $validated['berat'] . ' kg',
+        'harga_per_kg' => $this->formatRupiah($jenisPangan->harga),
+        'ongkir' => $this->formatRupiah($ongkir),
+        'pajak' => $this->formatRupiah($pajak),
+        'total' => $this->formatRupiah($total),
+    ]);
+}
+
+
+    public function submitPengajuan(Request $request)
+{
+    $validated = $request->validate([
+        'desa_tujuan_id' => 'required|exists:desa,id',
+        'jenis_pangan' => 'required|string',
+        'berat' => 'required|numeric|min:1',
+        'jasa_pengiriman' => 'required|string|in:JNE,SICEPAT,JNT',
+    ]);
+
+    $user = $request->user();
+
+    if (!$user->desa_id) {
+        return response()->json(['message' => 'User tidak memiliki desa yang terkait.'], 400);
+    }
+
+    $desaAsal = Desa::find($user->desa_id);
+    $desaTujuan = Desa::findOrFail($validated['desa_tujuan_id']);
+
+    if ($desaAsal->id == $validated['desa_tujuan_id']) {
+        return response()->json(['message' => 'Tidak dapat mengajukan ke desa sendiri.'], 400);
+    }
+
+    $jenisPangan = JenisPangan::where('nama_pangan', $validated['jenis_pangan'])->first();
+    if (!$jenisPangan) {
+        return response()->json(['message' => 'Jenis pangan tidak valid.'], 400);
+    }
+
+    $pangan = Pangan::where('desa_id', $validated['desa_tujuan_id'])
+    ->where('jenis_pangan', $validated['jenis_pangan'])
+    ->first();
+
+    if (!$pangan || $pangan->berat < $validated['berat']) {
+        return response()->json(['message' => 'Stok pangan tidak mencukupi.'], 400);
+    }
+
+
+    $jarak = $this->calculateDistance(
+        $desaAsal->latitude,
+        $desaAsal->longitude,
+        $desaTujuan->latitude,
+        $desaTujuan->longitude
+    );
+
+    if (is_null($jarak)) {
+        return response()->json(['message' => 'Gagal menghitung jarak.'], 500);
+    }
+
+    $tarifPerKgPerKm = match ($validated['jasa_pengiriman']) {
+        'JNE' => 6,
+        'SICEPAT' => 5,
+        'JNT' => 4,
+        default => 0,
+    };
+
+    $totalHarga = $validated['berat'] * $jenisPangan->harga;
+    $ongkir = $jarak * $validated['berat'] * $tarifPerKgPerKm;
+    $pajak = $totalHarga * 0.01;
+
+    $pengajuan = Pengajuan::create([
+        'desa_asal_id' => $desaAsal->id,
+        'desa_tujuan_id' => $desaTujuan->id,
+        'jenis_pangan' => $validated['jenis_pangan'],
+        'berat' => $validated['berat'],
+        'jarak' => $jarak,
+        'total_harga' => $totalHarga,
+        'ongkir' => $ongkir,
+        'pajak' => $pajak,
+        'jasa_pengiriman' => $validated['jasa_pengiriman'],
+        'status' => 'pending',
+    ]);
+
+    return response()->json(['message' => 'Pengajuan berhasil diajukan ke Bapanas.', 'data' => $pengajuan], 201);
+}
+
     
     // Endpoint untuk mendapatkan invoice
     public function getInvoice($id)

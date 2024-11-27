@@ -29,6 +29,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/pangan/desa-lain', [PanganController::class, 'getPanganDesaLain']);
 
     Route::post('/pengajuan', [PengajuanController::class, 'create']);
+    Route::post('/pengajuan/cek-ketersediaan', [PengajuanController::class, 'cekKetersediaan']);
+    Route::post('/pengajuan/simulate-invoice', [PengajuanController::class, 'simulateInvoice']);
+    Route::post('/pengajuan/submit', [PengajuanController::class, 'submitPengajuan']);
+
             
     // Mendapatkan invoice pengajuan berdasarkan ID
     Route::get('/pengajuan/{id}/invoice', [PengajuanController::class, 'getInvoice']);
