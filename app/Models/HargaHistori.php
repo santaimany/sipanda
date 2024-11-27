@@ -14,6 +14,7 @@ class HargaHistori extends Model
     protected $fillable = [
         'jenis_pangan_id',
         'harga',
+        'created_at',
     ];
 
     public function jenisPangan()

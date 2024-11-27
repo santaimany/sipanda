@@ -83,18 +83,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/dashboard/admin', function () {
         return response()->json(['message' => 'Welcome to Admin Dashboard']);
     });
-<<<<<<< HEAD
-});
-
-// Location routes (API Wilayah Indonesia)
-=======
 
 });
 
 // QR Code Verification
 Route::post('/user/verify-qr-code', [UserController::class, 'verifyQrCode']);
 // Location routes (API Emsifa Integration)
->>>>>>> 6d4ad16c1c184ef905aa2365180d8b521701ec9e
 Route::get('/provinces', [LocationController::class, 'getProvinces']);
 Route::get('/regencies/{province_id}', [LocationController::class, 'getRegencies']);
 Route::get('/districts/{regency_id}', [LocationController::class, 'getDistricts']);
