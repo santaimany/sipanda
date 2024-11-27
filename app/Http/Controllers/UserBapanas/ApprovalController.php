@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Bapanas;
+namespace App\Http\Controllers\UserBapanas;
 
 use App\Http\Controllers\Controller;
 use App\Models\Pengajuan;

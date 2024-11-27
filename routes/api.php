@@ -9,7 +9,7 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\User\PanganController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\User\PengajuanController;
-use App\Http\Controllers\Bapanas\ApprovalController;
+use App\Http\Controllers\UserBapanas\ApprovalController;
 use App\Http\Controllers\Location\LocationController;
 use App\Http\Controllers\UserBapanas\PendataanController;
 use App\Http\Controllers\UserBapanas\DetailPanganController;
@@ -33,13 +33,19 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/pangan/desa-lain', [PanganController::class, 'getPanganDesaLain']);
 
     Route::post('/pengajuan', [PengajuanController::class, 'create']);
+    Route::post('/pengajuan/cek-ketersediaan', [PengajuanController::class, 'cekKetersediaan']);
+    Route::post('/pengajuan/simulate-invoice', [PengajuanController::class, 'simulateInvoice']);
+    Route::post('/pengajuan/submit', [PengajuanController::class, 'submitPengajuan']);
+
             
     // Mendapatkan invoice pengajuan berdasarkan ID
     Route::get('/pengajuan/{id}/invoice', [PengajuanController::class, 'getInvoice']);
 
   
-    Route::get('/pengajuan/history', [PengajuanController::class, 'getUserHistory']);
-    Route::get('/pengajuan/riwayat/{desaId}', [PengajuanController::class, 'getRiwayatPengajuan']);
+    
+    Route::get('/pengajuan/riwayat', [PengajuanController::class, 'getRiwayatPengajuan']);
+    Route::get('/pengajuan/detail/{id}', [PengajuanController::class, 'getPengajuanDetail']);
+
     Route::get('/bapanas/pengajuan/pending', [ApprovalController::class, 'getPendingPengajuan']);
     Route::put('/bapanas/pengajuan/{id}/approve', [ApprovalController::class, 'approve']);
     Route::put('/bapanas/pengajuan/{id}/reject', [ApprovalController::class, 'reject']);
@@ -77,9 +83,18 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/dashboard/admin', function () {
         return response()->json(['message' => 'Welcome to Admin Dashboard']);
     });
+<<<<<<< HEAD
 });
 
 // Location routes (API Wilayah Indonesia)
+=======
+
+});
+
+// QR Code Verification
+Route::post('/user/verify-qr-code', [UserController::class, 'verifyQrCode']);
+// Location routes (API Emsifa Integration)
+>>>>>>> 6d4ad16c1c184ef905aa2365180d8b521701ec9e
 Route::get('/provinces', [LocationController::class, 'getProvinces']);
 Route::get('/regencies/{province_id}', [LocationController::class, 'getRegencies']);
 Route::get('/districts/{regency_id}', [LocationController::class, 'getDistricts']);
