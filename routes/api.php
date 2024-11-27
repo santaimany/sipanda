@@ -12,12 +12,16 @@ use App\Http\Controllers\User\PengajuanController;
 use App\Http\Controllers\Bapanas\ApprovalController;
 use App\Http\Controllers\Location\LocationController;
 use App\Http\Controllers\UserBapanas\PendataanController;
+use App\Http\Controllers\UserBapanas\DetailPanganController;
 use App\Http\Controllers\User\DashboardKepalaDesaController; // Import untuk dashboard kepala desa
 
 // Public routes
 Route::post('/register/identity', [RegisterController::class, 'registerIdentity']);
 Route::post('/register/kepaladesa/{userId}', [RegisterController::class , 'registerKepalaDesa'] );
 Route::post('/login', [LoginController::class, 'login']);
+
+// QR Code Verification
+Route::post('/user/verify-qr-code', [UserController::class, 'verifyQrCode']);
 
 Route::post('/calculate-distance', [JarakController::class, 'calculateDistance']);
 
@@ -65,15 +69,17 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::put('/pendataan/update/{pangan_id}', [PendataanController::class, 'updatePanganData']); // Update data
     Route::delete('/pendataan/delete/{pangan_id}', [PendataanController::class, 'deletePanganData']); // Delete data
 
+    Route::get('/detail-pangan', [DetailPanganController::class, 'index']);
+    Route::post('/detail-pangan/update/{id}', [DetailPanganController::class, 'updateHarga']);
+    Route::post('/detail-pangan/insert', [DetailPanganController::class, 'insertData']);
+    Route::get('/detail-pangan/histori/{id}', [DetailPanganController::class, 'historiHarga']);
+
     Route::get('/dashboard/admin', function () {
         return response()->json(['message' => 'Welcome to Admin Dashboard']);
     });
-
-    // QR Code Verification
-    Route::post('/user/verify-qr-code', [UserController::class, 'verifyQrCode']);
 });
 
-// Location routes (API Emsifa Integration)
+// Location routes (API Wilayah Indonesia)
 Route::get('/provinces', [LocationController::class, 'getProvinces']);
 Route::get('/regencies/{province_id}', [LocationController::class, 'getRegencies']);
 Route::get('/districts/{regency_id}', [LocationController::class, 'getDistricts']);
