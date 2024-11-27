@@ -21,7 +21,7 @@ class LoginController extends Controller
 
         // Cek jika kredensial salah
         if (!$user || !Auth::attempt($request->only('email', 'password'))) {
-            return response()->json(['message' => 'Invalid credentials'], 401);
+            return response()->json(['message' => 'Email atau password salah'], 401);
         }
 
         // Cek jika status user bukan 'approved'

@@ -88,6 +88,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
 // QR Code Verification
 Route::post('/user/verify-qr-code', [UserController::class, 'verifyQrCode']);
+Route::post('/user/check-status', [UserController::class, 'checkStatus']);
 // Location routes (API Emsifa Integration)
 Route::get('/provinces', [LocationController::class, 'getProvinces']);
 Route::get('/regencies/{province_id}', [LocationController::class, 'getRegencies']);

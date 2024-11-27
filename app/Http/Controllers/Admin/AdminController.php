@@ -15,8 +15,9 @@ class AdminController extends Controller
         
         $user = User::findOrFail($id);
 
+
         // Cek apakah status sudah disetujui
-        if ($user->status === 'approved') {
+        if ($user->status === 'verified') {
             return response()->json(['message' => 'User already approved.'], 400);
         }
 
