@@ -26,6 +26,7 @@ Route::prefix('register')->group(function () {
 Route::post('/login', [LoginController::class, 'login']);
 Route::post('/user/verify-qr-code', [UserController::class, 'verifyQrCode']);
 Route::post('/calculate-distance', [JarakController::class, 'calculateDistance']);
+Route::post('/user/check-status', [UserController::class, 'checkStatus']);
 
 // Location routes (API Emsifa Integration)
 Route::prefix('location')->group(function () {
