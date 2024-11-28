@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers\UserBapanas;
 
-use App\Http\Controllers\Controller;
-use App\Models\Pengajuan;
 use App\Models\Pangan;
+use App\Models\Pengajuan;
 use App\Models\JenisPangan;
+use App\Models\Notification;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 
 class ApprovalController extends Controller
 {
@@ -52,6 +53,8 @@ class ApprovalController extends Controller
             ->where('jenis_pangan', $pengajuan->jenis_pangan)
             ->first();
 
+            
+
         if ($panganDesaAsal) {
             // Jika desa tujuan sudah memiliki data pangan, tambahkan stok
             $panganDesaAsal->berat += $pengajuan->berat;
@@ -71,6 +74,15 @@ class ApprovalController extends Controller
         $pengajuan->update([
             'status' => 'approved',
             'bapanas_id' => $user->id, // Simpan ID bapanas yang menyetujui
+        ]);
+
+        Notification::create([
+            'user_id' => $pengajuan->desaAsal->kepala_desa_id, // User ID Kepala Desa
+            'desa_id' => $pengajuan->desa_asal_id,
+            'title' => 'Update Status Pengajuan',
+            'message' => "Pengajuan Anda dengan ID #{$pengajuan->invoice_number} telah {$pengajuan->status}. oleh Staff Bapanas {$user->nama}",
+            'type' => 'approval',
+            'is_read' => false,
         ]);
 
         return response()->json(['message' => 'Pengajuan berhasil disetujui.', 'data' => $pengajuan], 200);
@@ -102,6 +114,15 @@ class ApprovalController extends Controller
             'status' => 'rejected',
             'alasan' => $validated['alasan'],
             'bapanas_id' => $user->id, // Simpan ID bapanas yang menolak
+        ]);
+
+        Notification::create([
+            'user_id' => $pengajuan->desaAsal->kepala_desa_id, // User ID Kepala Desa
+            'desa_id' => $pengajuan->desa_asal_id,
+            'title' => 'Update Status Pengajuan',
+            'message' => "Pengajuan Anda dengan ID #{$pengajuan->invoice_number} telah di {$pengajuan->status}. oleh Staff Bapanas {$user->nama}",
+            'type' => 'approval',
+            'is_read' => false,
         ]);
 
         return response()->json(['message' => 'Pengajuan berhasil ditolak.', 'data' => $pengajuan], 200);

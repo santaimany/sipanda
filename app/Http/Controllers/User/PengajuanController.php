@@ -2,13 +2,16 @@
 
 namespace App\Http\Controllers\User;
 
-use App\Http\Controllers\Controller;
-use App\Models\Pengajuan;
-use App\Models\Pangan;
-use App\Models\JenisPangan;
 use App\Models\Desa;
+use App\Models\User;
+use App\Models\Pangan;
+use App\Models\Pengajuan;
+use App\Models\JenisPangan;
+use App\Models\Notification;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Container\Attributes\Auth;
 
 class PengajuanController extends Controller
 {
@@ -171,7 +174,32 @@ public function simulateInvoice(Request $request)
         'pajak' => $pajak,
         'jasa_pengiriman' => $validated['jasa_pengiriman'],
         'status' => 'pending',
+        'invoice_number' => strtoupper(uniqid('INV-')),
     ]);
+
+    // Notify all users with the role 'bapanas'
+    $bapanasUsers = User::where('role', 'bapanas')->get();
+    foreach ($bapanasUsers as $bapanas) {
+        Notification::create([
+            'user_id' => $bapanas->id,
+            'desa_id' => $pengajuan->desa_asal_id,
+            'title' => 'Pengajuan Baru',
+            'message' => "Pengajuan baru dengan ID #{$pengajuan->invoice_number} menunggu verifikasi.",
+            'type' => 'pengajuan',
+            'is_read' => false,
+        ]);
+    }
+
+    // Notify the user who made the submission
+    Notification::create([
+        'user_id' => $user->id,
+        'desa_id' => $pengajuan->desa_asal_id,
+        'title' => 'Pengajuan Berhasil',
+        'message' => "Anda telah berhasil membuat pengajuan dengan ID #{$pengajuan->invoice_number}. Menunggu verifikasi.",
+        'type' => 'pengajuan',
+        'is_read' => false,
+    ]);
+
 
     return response()->json(['message' => 'Pengajuan berhasil diajukan ke Bapanas.', 'data' => $pengajuan], 201);
 }
@@ -279,4 +307,3 @@ public function simulateInvoice(Request $request)
         return $earthRadius * $c; // Jarak dalam kilometer
     }
 }
-                                                                                        

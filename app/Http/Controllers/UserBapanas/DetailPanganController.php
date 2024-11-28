@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\UserBapanas;
 
+use App\Models\User;
 use App\Models\JenisPangan;
 use App\Models\HargaHistori;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
@@ -38,6 +40,19 @@ class DetailPanganController extends Controller
         // Update harga saat ini
         $jenisPangan->update(['harga' => $validated['harga']]);
 
+        $kepalaDesaUsers = User::where('role', 'kepala_desa')->get();
+
+    foreach ($kepalaDesaUsers as $kades) {
+    Notification::create([
+        'user_id' => $kades->id,
+        'desa_id' => $kades->desa_id,
+        'title' => 'Update Harga Pangan',
+        'message' => "Harga pangan untuk jenis {$jenisPangan} telah diperbarui menjadi Rp{$jenisPangan->harga} oleh Bapanas.",
+        'type' => 'harga_update',
+        'is_read' => false,
+    ]);
+}
+
         return response()->json([
             'success' => true,
             'message' => 'Harga berhasil diupdate',
@@ -62,6 +77,7 @@ class DetailPanganController extends Controller
             'message' => 'Data baru berhasil ditambahkan',
             'data' => $newData,
         ]);
+        
     }
 
     // Melihat histori harga

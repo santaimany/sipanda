@@ -19,6 +19,10 @@ class PanganController extends Controller
 
         $pangans = Pangan::where('desa_id', $user->desa_id)->get();
 
+        if ($pangans->isEmpty()) {
+            return response()->json(['message' => 'Data pangan belum tersedia' ]);
+        }
+        
         return response()->json([
             'message' => 'Data pangan ditemukan',
             'data' => $pangans,

@@ -57,4 +57,10 @@ class AdminController extends Controller
 
         return response()->json(['message' => 'Invalid action.'], 400);
     }
+
+    public function getPendingUsers()
+    {
+        $users = User::where('status', 'pending')->get();
+        return response()->json(['data' => $users]);
+    }
 }
