@@ -42,7 +42,7 @@ class AdminController extends Controller
             // Update status, QR Code, dan License Key
             $user->update([
                 'status' => 'pending_qr',
-                'qr_code' => "storage/$tempPath",
+                'qr_code' => null,
                 // 'qr_code' => "storage/$qrCodePath",
                 'license_key' => $licenseKey,
             ]);
