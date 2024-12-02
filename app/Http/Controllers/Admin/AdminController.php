@@ -12,9 +12,7 @@ class AdminController extends Controller
 {
     public function verifyUser($id, $action)
     {
-        
         $user = User::findOrFail($id);
-
 
         // Cek apakah status sudah disetujui
         if ($user->status === 'verified') {
@@ -25,8 +23,9 @@ class AdminController extends Controller
             // Generate License Key
             $licenseKey = Str::uuid();
 
-            // Path untuk menyimpan QR Code
+            // Path untuk menyimpan QR Code di public/storage/qrcodes
             $qrCodePath = "qrcodes/$licenseKey.png";
+            $qrCodeFullPath = public_path("storage/$qrCodePath");
 
             // Generate QR Code
             Builder::create()
@@ -35,12 +34,12 @@ class AdminController extends Controller
                 ->size(300)
                 ->margin(10)
                 ->build()
-                ->saveToFile(storage_path("app/$qrCodePath"));
+                ->saveToFile($qrCodeFullPath);
 
             // Update status, QR Code, dan License Key
             $user->update([
                 'status' => 'pending_qr',
-                'qr_code' => $qrCodePath,
+                'qr_code' => "storage/$qrCodePath",
                 'license_key' => $licenseKey,
             ]);
 
