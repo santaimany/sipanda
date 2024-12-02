@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers\Admin;
 
-use Illuminate\Support\Str;
 use App\Models\User;
+use Illuminate\Support\Str;
 use Endroid\QrCode\Builder\Builder;
-use Endroid\QrCode\Writer\PngWriter;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
+use Endroid\QrCode\Writer\PngWriter;
 
 class AdminController extends Controller
 {
@@ -24,8 +25,14 @@ class AdminController extends Controller
             $licenseKey = Str::uuid();
 
             // Path untuk menyimpan QR Code di public/storage/qrcodes
-            $qrCodePath = "qrcodes/$licenseKey.png";
+            $qrCodePath = "app/qrcodes/$licenseKey.png";
             $qrCodeFullPath = public_path("storage/$qrCodePath");
+
+            // $path = storage_path('app/public/qrcodes');
+            // if (!is_dir($path)) {
+            //     mkdir($path, 0755, true);
+            // }
+            // Log::info('QR code path: ' . $path);
 
             // Generate QR Code
             Builder::create()
