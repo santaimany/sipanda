@@ -25,14 +25,9 @@ class AdminController extends Controller
             $licenseKey = Str::uuid();
 
             // Path untuk menyimpan QR Code di public/storage/qrcodes
-            $qrCodePath = "app/qrcodes/$licenseKey.png";
-            $qrCodeFullPath = public_path("storage/$qrCodePath");
-
-            // $path = storage_path('app/public/qrcodes');
-            // if (!is_dir($path)) {
-            //     mkdir($path, 0755, true);
-            // }
-            // Log::info('QR code path: ' . $path);
+            $tempPath = "/tmp/$licenseKey.png";
+            // $qrCodePath = "app/qrcodes/$licenseKey.png";
+            // $qrCodeFullPath = public_path("storage/$qrCodePath");
 
             // Generate QR Code
             Builder::create()
@@ -41,18 +36,21 @@ class AdminController extends Controller
                 ->size(300)
                 ->margin(10)
                 ->build()
-                ->saveToFile($qrCodeFullPath);
+                ->saveToFile($tempPath);
+                // ->saveToFile($qrCodeFullPath);
 
             // Update status, QR Code, dan License Key
             $user->update([
                 'status' => 'pending_qr',
-                'qr_code' => "storage/$qrCodePath",
+                'qr_code' => "storage/$tempPath",
+                // 'qr_code' => "storage/$qrCodePath",
                 'license_key' => $licenseKey,
             ]);
 
             return response()->json([
                 'message' => 'User approved and QR Code generated.',
-                'qr_code_path' => asset("storage/$qrCodePath"),
+                'qr_code_path' => asset("storage/$tempPath"),
+                // 'qr_code_path' => asset("storage/$qrCodePath"),
             ]);
         }
 
