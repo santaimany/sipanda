@@ -38,12 +38,17 @@ class AdminController extends Controller
                 ->saveToFile($tempPath);
                 // ->saveToFile($qrCodeFullPath);
 
-            // Pindahkan file dari /tmp ke public/storage
-    $publicPath = public_path("storage/qrcodes/$licenseKey.png");
-    if (!is_dir(dirname($publicPath))) {
-        mkdir(dirname($publicPath), 0755, true); // Buat direktori jika belum ada
-    }
-    copy($tempPath, $publicPath); // Salin file ke public/storage
+            // Direktori publik untuk menyimpan QR Code
+$publicDir = public_path("storage/qrcodes");
+if (!is_dir($publicDir)) {
+    mkdir($publicDir, 0755, true); // Buat direktori jika belum ada
+}
+    // Salin file dari /tmp ke public/storage
+$publicPath = "$publicDir/$licenseKey.png";
+copy($tempPath, $publicPath);
+
+// URL file yang dapat diakses
+$qrCodeUrl = asset("storage/qrcodes/$licenseKey.png");
 
     // Update status dan License Key di database
     $user->update([
@@ -55,7 +60,7 @@ class AdminController extends Controller
     // Kembalikan URL file
     return response()->json([
         'message' => 'User approved and QR Code generated.',
-        'qr_code_path' => asset("storage/qrcodes/$licenseKey.png"),
+        'qr_code_url' => $qrCodeUrl,
     ]);
         }
 
