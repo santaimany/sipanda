@@ -27,6 +27,15 @@ Route::post('/login', [LoginController::class, 'login']);
 Route::post('/user/verify-qr-code', [UserController::class, 'verifyQrCode']);
 Route::post('/calculate-distance', [JarakController::class, 'calculateDistance']);
 Route::post('/user/check-status', [UserController::class, 'checkStatus']);
+Route::get('/qr-code/{filename}', function ($filename) {
+    $path = "/tmp/qrcodes/$filename";
+
+    if (!file_exists($path)) {
+        abort(404);
+    }
+
+    return response()->file($path);
+});
 
 // Location routes (API Emsifa Integration)
 Route::prefix('location')->group(function () {

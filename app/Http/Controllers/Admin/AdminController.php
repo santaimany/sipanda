@@ -24,7 +24,8 @@ class AdminController extends Controller
             $licenseKey = Str::uuid();
 
             // Path untuk menyimpan QR Code di public/storage/qrcodes
-            $tempPath = "/tmp/$licenseKey.png";
+            $tempPath = "/tmp/qrcodes/$licenseKey.png";
+            //$tempPath = "/tmp/$licenseKey.png";
             // $qrCodePath = "app/qrcodes/$licenseKey.png";
             // $qrCodeFullPath = public_path("storage/$qrCodePath");
 
@@ -38,17 +39,8 @@ class AdminController extends Controller
                 ->saveToFile($tempPath);
                 // ->saveToFile($qrCodeFullPath);
 
-            // Direktori publik untuk menyimpan QR Code
-$publicDir = public_path("storage/qrcodes");
-if (!is_dir($publicDir)) {
-    mkdir($publicDir, 0755, true); // Buat direktori jika belum ada
-}
-    // Salin file dari /tmp ke public/storage
-$publicPath = "$publicDir/$licenseKey.png";
-copy($tempPath, $publicPath);
-
 // URL file yang dapat diakses
-$qrCodeUrl = asset("storage/qrcodes/$licenseKey.png");
+$qrCodeUrl = url("/qr-code/$licenseKey.png");
 
     // Update status dan License Key di database
     $user->update([
