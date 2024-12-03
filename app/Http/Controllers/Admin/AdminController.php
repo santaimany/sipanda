@@ -24,7 +24,12 @@ class AdminController extends Controller
             $licenseKey = Str::uuid();
 
             // Path untuk menyimpan QR Code di public/storage/qrcodes
-            $tempPath = "/tmp/qrcodes/$licenseKey.png";
+            $tempDir = "/tmp/qrcodes";
+            if (!is_dir($tempDir)) {
+                mkdir($tempDir, 0755, true); // Membuat direktori /tmp/qrcodes jika belum ada
+            }
+
+            $tempPath = "$tempDir/$licenseKey.png";
             //$tempPath = "/tmp/$licenseKey.png";
             // $qrCodePath = "app/qrcodes/$licenseKey.png";
             // $qrCodeFullPath = public_path("storage/$qrCodePath");
