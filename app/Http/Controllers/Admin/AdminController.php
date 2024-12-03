@@ -45,7 +45,7 @@ class AdminController extends Controller
                 // ->saveToFile($qrCodeFullPath);
 
 // URL file yang dapat diakses
-$qrCodeUrl = url("/qr-code/$licenseKey.png");
+$qrCodeUrl = url("/api/qr-code/$licenseKey.png");
 
     // Update status dan License Key di database
     $user->update([
