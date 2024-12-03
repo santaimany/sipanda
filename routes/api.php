@@ -27,6 +27,7 @@ Route::post('/login', [LoginController::class, 'login']);
 Route::post('/user/verify-qr-code', [UserController::class, 'verifyQrCode']);
 Route::post('/calculate-distance', [JarakController::class, 'calculateDistance']);
 Route::post('/user/check-status', [UserController::class, 'checkStatus']);
+
 Route::get('/qr-code/{filename}', function ($filename) {
     $path = "/tmp/qrcodes/$filename";
 
