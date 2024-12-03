@@ -38,20 +38,25 @@ class AdminController extends Controller
                 ->saveToFile($tempPath);
                 // ->saveToFile($qrCodeFullPath);
 
-            // Update status, QR Code, dan License Key
-            $user->update([
-                'status' => 'pending_qr',
-                'qr_code' => null,
-                // 'qr_code' => "storage/$qrCodePath",
-                'license_key' => $licenseKey,
-            ]);
+            // Pindahkan file dari /tmp ke public/storage
+    $publicPath = public_path("storage/qrcodes/$licenseKey.png");
+    if (!is_dir(dirname($publicPath))) {
+        mkdir(dirname($publicPath), 0755, true); // Buat direktori jika belum ada
+    }
+    copy($tempPath, $publicPath); // Salin file ke public/storage
 
-            return response()->json([
-                'message' => 'User approved and QR Code generated.',
-                'qr_code_base64' => 'data:image/png;base64,' . base64_encode(file_get_contents($tempPath)),
-                //'qr_code_path' => asset("storage/$tempPath"),
-                // 'qr_code_path' => asset("storage/$qrCodePath"),
-            ]);
+    // Update status dan License Key di database
+    $user->update([
+        'status' => 'pending_qr',
+        'license_key' => $licenseKey,
+        'qr_code' => "storage/qrcodes/$licenseKey.png",
+    ]);
+
+    // Kembalikan URL file
+    return response()->json([
+        'message' => 'User approved and QR Code generated.',
+        'qr_code_path' => asset("storage/qrcodes/$licenseKey.png"),
+    ]);
         }
 
         if ($action === 'reject') {
