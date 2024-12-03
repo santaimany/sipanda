@@ -121,7 +121,7 @@ class ApprovalController extends Controller
             'desa_id' => $pengajuan->desa_asal_id,
             'title' => 'Update Status Pengajuan',
             'message' => "Pengajuan Anda dengan ID #{$pengajuan->invoice_number} telah di {$pengajuan->status}. oleh Staff Bapanas {$user->nama}",
-            'type' => 'approval',
+            'type' => 'rejected',
             'is_read' => false,
         ]);
 
