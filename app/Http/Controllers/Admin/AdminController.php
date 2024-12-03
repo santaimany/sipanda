@@ -48,7 +48,8 @@ class AdminController extends Controller
 
             return response()->json([
                 'message' => 'User approved and QR Code generated.',
-                'qr_code_path' => asset("storage/$tempPath"),
+                'qr_code_base64' => 'data:image/png;base64,' . base64_encode(file_get_contents($tempPath)),
+                //'qr_code_path' => asset("storage/$tempPath"),
                 // 'qr_code_path' => asset("storage/$qrCodePath"),
             ]);
         }
