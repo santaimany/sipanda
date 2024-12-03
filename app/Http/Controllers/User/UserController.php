@@ -60,7 +60,7 @@ class UserController extends Controller
                 return response()->json([
                     'status' => 'pending_qr',
                     'message' => 'Akun Anda telah disetujui! Lakukan Verifikasi dengan Qr Code.',
-                    'qr_code_url' => asset("storage/{$user->qr_code}"),
+                    'qr_code_url' => asset("/api/qr-code/{$user->qr_code}"),
                 ], 200);
 
             case 'pending':

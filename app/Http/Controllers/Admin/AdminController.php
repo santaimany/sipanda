@@ -44,6 +44,16 @@ class AdminController extends Controller
                 ->saveToFile($tempPath);
                 // ->saveToFile($qrCodeFullPath);
 
+// Direktori publik untuk menyimpan QR Code
+$publicDir = public_path("storage/qrcodes");
+if (!is_dir($publicDir)) {
+    mkdir($publicDir, 0755, true); // Buat direktori jika belum ada
+}
+
+// Salin file dari /tmp ke public/storage
+$publicPath = "$publicDir/{$licenseKey}.png";
+copy($tempPath, $publicPath);
+
 // URL file yang dapat diakses
 $qrCodeUrl = url("/api/qr-code/$licenseKey.png");
 
