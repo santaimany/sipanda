@@ -47,7 +47,7 @@ class DetailPanganController extends Controller
         'user_id' => $kades->id,
         'desa_id' => $kades->desa_id,
         'title' => 'Update Harga Pangan',
-        'message' => "Harga pangan untuk jenis {$jenisPangan} telah diperbarui menjadi Rp{$jenisPangan->harga} oleh Bapanas.",
+        'message' => "Harga pangan untuk jenis {$jenisPangan->nama_pangan} telah diperbarui menjadi Rp{$jenisPangan->harga} oleh Bapanas.",
         'type' => 'harga_update',
         'is_read' => false,
     ]);
