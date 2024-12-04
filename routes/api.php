@@ -17,6 +17,7 @@ use App\Http\Controllers\{
     UserBapanas\PendataanController,
     UserBapanas\DetailPanganController
 };
+use App\Http\Controllers\SettingsController;
 
 // Public routes
 Route::prefix('register')->group(function () {
@@ -114,6 +115,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/', [NotificationController::class, 'getUserNotifications']);
         Route::put('/{id}/read', [NotificationController::class, 'markAsRead']);
     });
+
+    Route::get('/user/settings', [SettingsController::class, 'getSettings']);
+    Route::post('/user/settings/update', [SettingsController::class, 'updateSettings']);
+
 
     // Logout
     Route::post('/logout', [LoginController::class, 'logout']);
