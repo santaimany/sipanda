@@ -42,7 +42,7 @@ class PanganController extends Controller
         $pangans = Pangan::where('desa_id', $user->desa_id)->get();
 
         if ($pangans->isEmpty()) {
-            return response()->json(['message' => 'Tidak ada data pangan untuk desa ini'], 404);
+            return response()->json(['message' => 'Tidak ada data pangan untuk desa ini']);
         }
 
         // Hitung total berat
