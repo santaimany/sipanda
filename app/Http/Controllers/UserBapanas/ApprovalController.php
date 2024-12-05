@@ -8,9 +8,32 @@ use App\Models\JenisPangan;
 use App\Models\Notification;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 
 class ApprovalController extends Controller
 {
+
+    public function getUserBapanas()
+    {
+        $user = Auth::user();
+
+        // Pastikan user memiliki role 'kepala_desa'
+        if ($user->role !== 'bapanas') {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        // Ambil data nama user dan nama desa
+        $data = [
+            'name' => $user->name,
+
+        ];
+
+        return response()->json([
+            'message' => 'Success',
+            'data' => $data,
+        ], 200);
+    }
+
     // Menyetujui pengajuan
     public function approve(Request $request, $id)
     {

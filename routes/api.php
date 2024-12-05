@@ -118,6 +118,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::get('/user/settings', [SettingsController::class, 'getSettings']);
     Route::post('/user/settings/update', [SettingsController::class, 'updateSettings']);
+    Route::get('/bapanas/user', [ApprovalController::class, 'getBapanasUser']);
 
 
     // Logout
