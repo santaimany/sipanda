@@ -167,8 +167,7 @@ class ApprovalController extends Controller
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        $pengajuan = Pengajuan::where('bapanas_id', $user->id)
-            ->where('status', 'approved')
+        $pengajuan = Pengajuan::where('status', 'approved')
             ->with(['desaAsal', 'desaTujuan'])
             ->get();
 
