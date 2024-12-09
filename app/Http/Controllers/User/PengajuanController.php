@@ -159,8 +159,8 @@ public function simulateInvoice(Request $request)
         default => 0,
     };
 
-    $totalHarga = $validated['berat'] * $jenisPangan->harga;
     $ongkir = $jarak * $validated['berat'] * $tarifPerKgPerKm;
+    $totalHarga = $validated['berat'] * $jenisPangan->harga * $ongkir;
     $pajak = $totalHarga * 0.01;
 
     $pengajuan = Pengajuan::create([
