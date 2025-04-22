@@ -20,6 +20,8 @@ class CreateNotificationsTable extends Migration
             $table->boolean('is_read')->default(false); // Status sudah dibaca atau belum
             $table->timestamps(); // Timestamps untuk created_at dan updated_at
         });
+
+        Schema::enableForeignKeyConstraints();
     }
 
     /**
