@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 
 class NotificationController extends Controller
 {
-    // Mendapatkan semua notifikasi untuk user yang login
+   
     public function getUserNotifications(Request $request)
     {
         $user = $request->user();

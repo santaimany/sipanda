@@ -159,9 +159,10 @@ public function simulateInvoice(Request $request)
         default => 0,
     };
 
+    $totalHarga = $validated['berat'] * $jenisPangan->harga;
     $ongkir = $jarak * $validated['berat'] * $tarifPerKgPerKm;
-    $totalHarga = $validated['berat'] * $jenisPangan->harga * $ongkir;
     $pajak = $totalHarga * 0.01;
+    $total = $totalHarga + $ongkir + $pajak;
 
     $pengajuan = Pengajuan::create([
         'desa_asal_id' => $desaAsal->id,
@@ -169,7 +170,7 @@ public function simulateInvoice(Request $request)
         'jenis_pangan' => $validated['jenis_pangan'],
         'berat' => $validated['berat'],
         'jarak' => $jarak,
-        'total_harga' => $totalHarga,
+        'total_harga' => $total,
         'ongkir' => $ongkir,
         'pajak' => $pajak,
         'jasa_pengiriman' => $validated['jasa_pengiriman'],

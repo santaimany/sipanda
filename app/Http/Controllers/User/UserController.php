@@ -26,7 +26,7 @@ class UserController extends Controller
         }
 
         // Update status menjadi approved
-        $user->update(['status' => 'verified']);
+        $user->update(['status' => 'approved']);
 
         return response()->json(['message' => 'User verified successfully.']);
     }
@@ -50,7 +50,7 @@ class UserController extends Controller
 
         // Cek status akun
         switch ($user->status) {
-            case 'verified':
+            case 'approved':
                 return response()->json([
                     'status' => 'approved',
                     'message' => 'Akun Anda telah disetujui.',

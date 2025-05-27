@@ -4,6 +4,7 @@ namespace App\Http\Controllers\UserBapanas;
 
 use App\Models\User;
 use App\Models\JenisPangan;
+use App\Models\Pangan;
 use App\Models\HargaHistori;
 use App\Models\Notification;
 use Illuminate\Http\Request;
@@ -37,29 +38,32 @@ class DetailPanganController extends Controller
             'harga' => $jenisPangan->harga,
         ]);
 
-        // Update harga saat ini
+        // Update harga saat ini di tabel jenis_pangan
         $jenisPangan->update(['harga' => $validated['harga']]);
+
+        // Update harga di tabel pangan berdasarkan nama jenis pangan
+        Pangan::where('jenis_pangan', $jenisPangan->nama_pangan)
+              ->update(['harga' => $validated['harga']]);
 
         $kepalaDesaUsers = User::where('role', 'kepala_desa')->get();
 
-    foreach ($kepalaDesaUsers as $kades) {
-    Notification::create([
-        'user_id' => $kades->id,
-        'desa_id' => $kades->desa_id,
-        'title' => 'Update Harga Pangan',
-        'message' => "Harga pangan untuk jenis {$jenisPangan->nama_pangan} telah diperbarui menjadi Rp{$jenisPangan->harga} oleh Bapanas.",
-        'type' => 'harga_update',
-        'is_read' => false,
-    ]);
-}
+        foreach ($kepalaDesaUsers as $kades) {
+            Notification::create([
+                'user_id' => $kades->id,
+                'desa_id' => $kades->desa_id,
+                'title' => 'Update Harga Pangan',
+                'message' => "Harga pangan untuk jenis {$jenisPangan->nama_pangan} telah diperbarui menjadi Rp" . number_format($validated['harga'], 0, ',', '.') . " oleh Bapanas.",
+                'type' => 'harga_update',
+                'is_read' => false,
+            ]);
+        }
 
         return response()->json([
             'success' => true,
-            'message' => 'Harga berhasil diupdate',
+            'message' => 'Harga berhasil diupdate ',
             'data' => $jenisPangan,
         ]);
     }
-
     public function insertData(Request $request)
     {
         $validated = $request->validate([

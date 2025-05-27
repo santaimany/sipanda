@@ -6,6 +6,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "dedoc/scramble": "^0.12.19",
         "endroid/qr-code": "^5.0",
         "guzzlehttp/guzzle": "^7.9",
         "laravel/framework": "^11.9",

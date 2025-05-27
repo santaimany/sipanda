@@ -58,9 +58,7 @@ class PendataanController extends Controller
     return response()->json($dataPangan);
 }
 
-    /**
-     * Tambahkan data pangan berdasarkan input dari form.
-     */public function insertPanganData(Request $request, $desa_id)
+public function insertPanganData(Request $request, $desa_id)
 {
     $desa = Desa::where('id', $desa_id)->whereNotNull('kepala_desa_id')->first();
     if (!$desa) {

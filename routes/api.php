@@ -47,7 +47,7 @@ Route::prefix('location')->group(function () {
     Route::get('/villages/{district_id}', [LocationController::class, 'getVillages']);
 });
 
-// Protected routes (requires token)
+
 Route::middleware(['auth:sanctum'])->group(function () {
     // Pangan routes
     Route::prefix('pangan')->group(function () {
@@ -118,7 +118,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::get('/user/settings', [SettingsController::class, 'getSettings']);
     Route::post('/user/settings/update', [SettingsController::class, 'updateSettings']);
-    Route::get('/bapanas/user', [ApprovalController::class, 'getBapanasUser']);
+    Route::get('/bapanas/user', [ApprovalController::class, 'getUserBapanas']);
 
 
     // Logout

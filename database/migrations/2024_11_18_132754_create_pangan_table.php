@@ -13,6 +13,7 @@ class CreatePanganTable extends Migration
             $table->unsignedBigInteger('desa_id'); // Desa pemilik pangan
             $table->string('jenis_pangan', 100); // Jenis pangan
             $table->decimal('berat', 10, 2); // Berat pangan
+            $table->decimal('harga', 10, 2); // Harga pangan
             $table->timestamp('tanggal'); // Tanggal pencatatan
             $table->timestamps();
 

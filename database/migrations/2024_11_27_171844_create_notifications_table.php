@@ -21,6 +21,7 @@ class CreateNotificationsTable extends Migration
             $table->timestamps(); // Timestamps untuk created_at dan updated_at
         });
 
+        
         Schema::enableForeignKeyConstraints();
     }
 

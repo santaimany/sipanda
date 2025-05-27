@@ -11,13 +11,21 @@ class Pangan extends Model
 
     protected $table = 'pangan';
     protected $fillable = [
-        'desa_id', 'jenis_pangan', 'berat', 'tanggal', 'harga'
+        'desa_id', 'jenis_pangan', 'berat', 'harga','tanggal'
     ];
 
     public function desa()
     {
         return $this->belongsTo(Desa::class, 'desa_id');
+      
     }
+
+    public function jenisPangan()
+    {
+        return $this->belongsTo(JenisPangan::class);
+    }
+
+
 
     protected $dates = ['updated_at'];
 }
